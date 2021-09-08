@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2021-08-27T17:46:09.196916",
+  "@@last_modified": "2021-09-08T15:33:32.068512",
   "initializing_data": "Initializing data...",
   "@initializing_data": {
     "type": "text",
@@ -140,6 +140,26 @@
   },
   "prefix_forward_email": "Fwd:",
   "@prefix_forward_email": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "your_email_being_sent": "Your email being sent...",
+  "@your_email_being_sent": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "your_email_should_have_at_least_one_recipient": "Your email should have at least one recipient",
+  "@your_email_should_have_at_least_one_recipient": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "message_sent": "Message sent",
+  "@message_sent": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "error_message_sent": "Error message sent",
+  "@error_message_sent": {
     "type": "text",
     "placeholders": {}
   }
