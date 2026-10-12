@@ -1,6 +1,6 @@
 {
   "id": "email_view_html",
-  "kinds": ["text"],
+  "kinds": ["text", "pixel"],
   "corpora": ["emails"],
   "triggerPaths": [
     "core/lib/presentation/utils/html_transformer/**",
