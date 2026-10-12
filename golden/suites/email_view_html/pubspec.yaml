@@ -1,0 +1,24 @@
+name: golden_email_view_html
+description: Golden suite for email bodies as the email view renders them on web, Android and iOS.
+publish_to: "none"
+
+resolution: workspace
+
+version: 1.0.0
+
+environment:
+  sdk: ">=3.9.0 <4.0.0"
+
+dependencies:
+  core:
+    path: ../../../core
+  flutter:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+  golden_kit:
+    path: ../../kit
+  golden_tmail_html:
+    path: ../../adapters/tmail_html
+  tmail_ui_user:
+    path: ../../..
