@@ -57,15 +57,17 @@ run_pixel() {
   local projects=() update_flag
   for suite in "$@"; do projects+=(--project "$suite:*"); done
   case $mode in
-    update) update_flag=--update-snapshots=all ;;
-    *) update_flag=--update-snapshots=none ;;
+    update)
+      update_flag=--update-snapshots=all
+      # Regenerated from scratch, so goldens of removed cases do not linger.
+      for suite in "$@"; do rm -rf "$golden/suites/$suite/goldens/pixel"; done ;;
+    verify)
+      update_flag=--update-snapshots=none
+      projects+=(--project golden-orphans) ;;
+    mutation)
+      # Never writes a golden: a missing one fails the mutation run.
+      update_flag=--update-snapshots=none ;;
   esac
-  if [[ $mode == update ]]; then
-    # Regenerated from scratch, so goldens of removed cases do not linger.
-    for suite in "$@"; do rm -rf "$golden/suites/$suite/goldens/pixel"; done
-  else
-    projects+=(--project golden-orphans)
-  fi
   local image
   image=$(docker build --platform linux/amd64 -q "$golden/playwright")
   echo "== pixel goldens ($mode): $*"
