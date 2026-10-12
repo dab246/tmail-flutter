@@ -1,0 +1,13 @@
+{
+  "name": "golden-playwright-runner",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.52.0",
+    "@types/node": "22.15.3",
+    "typescript": "5.8.3"
+  }
+}
