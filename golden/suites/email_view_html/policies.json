@@ -1,0 +1,10 @@
+{
+  "eml_44": {
+    "reason": "the sanitizer drops hrefs whose scheme is not allowlisted (twakemail.mobile:, zoommtg:); the link text stays",
+    "maxLostLinks": 2
+  },
+  "eml_45": {
+    "reason": "the sanitizer removes the collapsed-signature toggle button, and its '...' label with it",
+    "maxMissingTextTokens": 1
+  }
+}

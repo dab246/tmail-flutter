@@ -18,6 +18,12 @@ workspace:
   - labels
   - cozy
   - workplace
+  - golden/kit
+  - golden/adapters/tmail_html
+  - golden/suites/email_view_html
+  - golden/suites/composer_html
+  - golden/suites/print_html
+  - golden/suites/signature_html
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43

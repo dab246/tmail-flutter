@@ -1,0 +1,15 @@
+{
+  "id": "email_view_html",
+  "kinds": ["text", "pixel"],
+  "corpora": ["emails"],
+  "triggerPaths": [
+    "core/lib/presentation/utils/html_transformer/**",
+    "core/lib/presentation/views/html_viewer/**",
+    "core/lib/utils/html/**",
+    "core/lib/presentation/constants/**",
+    "core/lib/presentation/utils/responsive_utils.dart",
+    "lib/features/email/data/local/html_analyzer.dart",
+    "lib/features/email/presentation/email_view.dart",
+    "lib/features/email/presentation/styles/email_view_styles.dart"
+  ]
+}

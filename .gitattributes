@@ -1,0 +1,4 @@
+# Golden fixtures and text snapshots are gzipped to keep pull requests small.
+# Readable local diff: git config diff.gzip.textconv "gzip -dc"
+golden/**/*.gz binary diff=gzip
+golden/suites/*/goldens/pixel/** binary linguist-generated=true

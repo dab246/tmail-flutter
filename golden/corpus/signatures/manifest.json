@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "fixtures": {
+    "sig_1": {"format": "html", "tags": ["fabricated", "images", "links", "tables"]},
+    "sig_2": {"format": "html", "tags": ["fabricated", "text-only"]},
+    "sig_3": {"format": "html", "tags": ["fabricated", "line-height", "links"]},
+    "sig_4": {"format": "html", "tags": ["event-handlers", "fabricated", "links", "script", "unsafe-links"]},
+    "sig_5": {"format": "html", "tags": ["code", "fabricated", "links", "quotes"]}
+  }
+}
