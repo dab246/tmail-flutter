@@ -129,6 +129,17 @@ void main() {
     expect(File('$folder/${EmailViewRenderSuite.webFontPath}/TwakeInter-Regular.ttf').existsSync(), isTrue);
   });
 
+  test('SHOULD pick cases per target and fail loudly WHEN one target has none', () async {
+    const onlyWebShows = EmailViewMutant(
+      id: 'per target',
+      part: _quoteStyle,
+      targets: {EmailViewTarget.web, EmailViewTarget.iosPreviewer},
+      fixtureTag: 'responsive',
+    );
+
+    await expectLater(_export(temp, mutants: [onlyWebShows]), throwsStateError);
+  });
+
   test('SHOULD fail loudly WHEN no case can show a mutant', () async {
     const unseen = EmailViewMutant(id: 'unseen', part: _quoteStyle, targets: {EmailViewTarget.web}, fixtureTag: 'none');
 

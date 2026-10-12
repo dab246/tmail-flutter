@@ -16,6 +16,7 @@ class EmailViewMutant {
     required this.targets,
     required this.fixtureTag,
     this.state = 'collapsed',
+    this.requiredMarker,
   });
 
   final String id;
@@ -26,7 +27,11 @@ class EmailViewMutant {
   final String fixtureTag;
   final String state;
 
-  /// How many cases per mutant are rendered; one is enough when it is killed.
+  /// Text the case's document must contain for the block to have an effect,
+  /// e.g. the `lazy` attribute the background script acts on.
+  final String? requiredMarker;
+
+  /// How many cases per mutant and target are rendered; one is enough when it is killed.
   static const maxCases = 3;
 }
 
@@ -70,7 +75,7 @@ const emailViewMutants = [
     id: 'without image normalize script',
     part: _normalizeImageScript,
     targets: {EmailViewTarget.nativeAndroid, EmailViewTarget.web},
-    fixtureTag: 'images',
+    fixtureTag: 'wide-image',
   ),
   EmailViewMutant(
     id: 'without mobile responsive layout script',
@@ -83,6 +88,7 @@ const emailViewMutants = [
     part: _lazyBackgroundScript,
     targets: {EmailViewTarget.nativeAndroid, EmailViewTarget.web},
     fixtureTag: 'background-images',
+    requiredMarker: 'lazy=""',
   ),
   EmailViewMutant(
     id: 'without content size script',

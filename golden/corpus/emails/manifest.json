@@ -39,6 +39,7 @@
     "eml_43": {"format": "html", "tags": ["cid-images", "images", "line-height", "links", "quotes", "signature", "tables", "wide-content"]},
     "eml_44": {"format": "html", "tags": ["links", "signature"]},
     "eml_45": {"format": "html", "tags": ["collapsed-signature", "fabricated", "links", "signature"]},
-    "eml_46": {"format": "text", "tags": ["ascii-table", "fabricated", "markdown-table", "plain-text"]}
+    "eml_46": {"format": "text", "tags": ["ascii-table", "fabricated", "markdown-table", "plain-text"]},
+    "eml_47": {"format": "html", "tags": ["background-images", "fabricated", "images", "links", "marketing", "tables", "wide-content", "wide-image"]}
   }
 }

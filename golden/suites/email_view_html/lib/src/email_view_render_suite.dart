@@ -114,12 +114,13 @@ class EmailViewRenderSuite implements RenderGoldenSuite {
   /// Fails loudly when no case can show the mutant: a mutant that is never
   /// rendered would pass silently.
   void _exportMutant(RenderExportWriter writer, EmailViewMutant mutant) {
-    final candidates = _mutableCases
-        .where((c) => _shows(mutant, c))
-        .take(EmailViewMutant.maxCases)
-        .toList();
-    if (candidates.isEmpty) {
-      throw StateError('mutant "${mutant.id}": no ${mutant.state} case tagged ${mutant.fixtureTag} on ${mutant.targets}');
+    final candidates = [
+      for (final target in mutant.targets)
+        ..._mutableCases.where((c) => c.target == target && _shows(mutant, c)).take(EmailViewMutant.maxCases),
+    ];
+    final unseenOn = mutant.targets.where((t) => !candidates.any((c) => c.target == t));
+    if (unseenOn.isNotEmpty) {
+      throw StateError('mutant "${mutant.id}": no ${mutant.state} case tagged ${mutant.fixtureTag} on $unseenOn');
     }
     for (final candidate in candidates) {
       final part = mutant.part(candidate.target, candidate.target.standardViewport);
@@ -134,7 +135,13 @@ class EmailViewRenderSuite implements RenderGoldenSuite {
 
   static bool _shows(EmailViewMutant mutant, _MutableCase candidate) {
     if (!mutant.targets.contains(candidate.target)) return false;
-    return candidate.fixture.hasTag(mutant.fixtureTag) && candidate.renderCase.state == mutant.state;
+    if (!candidate.fixture.hasTag(mutant.fixtureTag)) return false;
+    return candidate.renderCase.state == mutant.state && _hasMarker(mutant, candidate.document);
+  }
+
+  static bool _hasMarker(EmailViewMutant mutant, String document) {
+    final marker = mutant.requiredMarker;
+    return marker == null || document.contains(marker);
   }
 
   void _copyWebFonts(RenderExportWriter writer, String folder) {

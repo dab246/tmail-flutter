@@ -67,6 +67,29 @@ const contentSizeReported: PageInvariant = {
 };
 
 /**
+ * The Android viewer resizes its WebView when the body resizes after load
+ * (late images, an expanded quote). Growing the body must call the channel
+ * again; the responsive script alone reports window resizes only.
+ */
+const bodyResizeReported: PageInvariant = {
+  id: 'body-resize-reported',
+  phase: 'after-capture',
+  appliesTo: (c) => c.target === 'native-android',
+  check: async ({ page }) => {
+    const reported = await page.evaluate(async (key) => {
+      const calls = (window as unknown as Record<string, string[]>)[key] ?? [];
+      const before = calls.length;
+      const spacer = document.createElement('div');
+      spacer.style.height = '137px';
+      document.body.appendChild(spacer);
+      for (let frame = 0; frame < 5; frame++) await new Promise((resolve) => requestAnimationFrame(resolve));
+      return calls.length > before;
+    }, BRIDGE_CALLS);
+    return reported ? null : 'growing the body did not call the content-size channel';
+  },
+};
+
+/**
  * The web app serves its design font and the document declares it. A face
  * loads only when text uses it, and emails often style all their text, so
  * the font is loaded explicitly: no face, or a face that fails, is an error.
@@ -109,7 +132,7 @@ const plugin: SuitePlugin = {
     ...(c.target === 'web' ? [] : [flutterInAppWebViewBridge]),
     ...(c.state === 'expanded' ? [expandQuotes] : []),
   ],
-  invariants: [onlyDesignFontsMissing, noHorizontalOverflow, contentSizeReported, designFontLoadable, quoteToggleWorks],
+  invariants: [onlyDesignFontsMissing, noHorizontalOverflow, contentSizeReported, designFontLoadable, quoteToggleWorks, bodyResizeReported],
 };
 
 export default plugin;
