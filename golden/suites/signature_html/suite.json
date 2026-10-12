@@ -1,0 +1,8 @@
+{
+  "id": "signature_html",
+  "kinds": ["text"],
+  "corpora": ["signatures"],
+  "triggerPaths": [
+    "core/lib/presentation/utils/html_transformer/**"
+  ]
+}

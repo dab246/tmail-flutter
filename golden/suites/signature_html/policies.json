@@ -1,0 +1,6 @@
+{
+  "sig_4": {
+    "reason": "the sanitizer drops the javascript: href; the link text stays",
+    "maxLostLinks": 1
+  }
+}
