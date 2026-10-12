@@ -53,6 +53,16 @@ export_pixel() {
     GOLDEN_EXPORT_DIR="$golden/playwright/.export" "$flutter_cmd" test test/export_documents_test.dart)
 }
 
+# Lossless; deterministic, so unchanged images stay byte-identical across updates.
+optimize_goldens() {
+  local image=$1; shift
+  local dirs=()
+  for suite in "$@"; do dirs+=("/golden/suites/$suite/goldens/pixel"); done
+  echo "== optimizing pixel goldens: $*"
+  docker run --rm --platform linux/amd64 -v "$golden:/golden" "$image" \
+    bash -c 'find "$@" -name "*.png" -print0 | xargs -0 -P "$(nproc)" -n 8 optipng -quiet -o2 -strip all' _ "${dirs[@]}"
+}
+
 run_pixel() {
   local projects=() update_flag
   for suite in "$@"; do projects+=(--project "$suite:*"); done
@@ -77,6 +87,7 @@ run_pixel() {
     -e GOLDEN_MODE="$mode" -e CI="${CI:-}" \
     "$image" bash -c 'npm install --no-package-lock --no-audit --no-fund >/dev/null && npx playwright test "$@"' \
     _ "${projects[@]}" "$update_flag"
+  if [[ $mode == update ]]; then optimize_goldens "$image" "$@"; fi
 }
 
 status=0
