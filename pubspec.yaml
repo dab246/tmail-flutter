@@ -320,6 +320,11 @@ dev_dependencies:
 
   patrol_finders: 3.2.0
 
+  # Pinned: 3.0.4 generates imports of package:material_ui (Flutter 3.47+).
+  bdd_widget_test: 3.0.3
+
+  cucumber_gherkin: 42.0.1
+
   plugin_platform_interface: 2.1.8
 
   sentry_dart_plugin: ^3.2.1

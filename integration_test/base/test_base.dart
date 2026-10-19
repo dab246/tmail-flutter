@@ -17,29 +17,35 @@ class TestBase {
 
   TestBase._internal();
 
+  static const patrolTesterConfig = PatrolTesterConfig(
+    settlePolicy: SettlePolicy.trySettle,
+    existsTimeout: Duration(seconds: 30),
+    visibleTimeout: Duration(seconds: 30),
+    settleTimeout: Duration(seconds: 30),
+    printLogs: true,
+  );
+
+  static final platformAutomatorConfig = PlatformAutomatorConfig.fromOptions(
+    findTimeout: const Duration(seconds: 30),
+  );
+
+  static const framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.benchmarkLive;
+
   void runPatrolTest({
     required String description,
     required BaseScenario Function(PatrolIntegrationTester $, RobotFactory robots) scenarioBuilder,
     List<TestTags> tags = const [TestTags.ios],
   }) {
-    patrolSetUp(_setup);
+    patrolSetUp(setUpEnvironment);
 
-    patrolTearDown(_tearDown);
+    patrolTearDown(tearDownEnvironment);
 
     patrolTest(
       description,
-      config: const PatrolTesterConfig(
-        settlePolicy: SettlePolicy.trySettle,
-        existsTimeout: Duration(seconds: 30),
-        visibleTimeout: Duration(seconds: 30),
-        settleTimeout: Duration(seconds: 30),
-        printLogs: true,
-      ),
+      config: patrolTesterConfig,
       tags: tags.map((t) => t.name).toList(),
-      platformAutomatorConfig: PlatformAutomatorConfig.fromOptions(
-        findTimeout: const Duration(seconds: 30),
-      ),
-      framePolicy: LiveTestWidgetsFlutterBindingFramePolicy.benchmarkLive,
+      platformAutomatorConfig: platformAutomatorConfig,
+      framePolicy: framePolicy,
       ($) async {
         await setupTest();
         await scenarioBuilder($, createRobotFactory($)).execute();
@@ -57,11 +63,11 @@ class TestBase {
     };
   }
 
-  Future<void> _setup() async {
+  Future<void> setUpEnvironment() async {
     PlatformInfo.isIntegrationTesting = true;
   }
 
-  Future<void> _tearDown() async {
+  Future<void> tearDownEnvironment() async {
     PlatformInfo.isIntegrationTesting = false;
     await BackendResetClient.reset();
   }

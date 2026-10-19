@@ -1,0 +1,12 @@
+# bdd_widget_test generator options for integration_test/features/<area>/*.feature.
+# See docs/testing/gherkin-conventions.md.
+testMethodName: gherkinPatrolTest
+testerType: PatrolIntegrationTester
+testerName: $
+# Relative to the feature file, so steps live in integration_test/features/steps/.
+stepFolderName: ../steps
+# patrolTest initialises its own binding.
+includeIntegrationTestBinding: false
+# Feature files and step files sit at the same depth, so one relative import serves both.
+customHeaders:
+  - "import '../../gherkin/gherkin_support.dart';"
