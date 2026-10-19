@@ -58,9 +58,11 @@ trap cleanup EXIT
 echo "Copying integration_test/integration_test_env.file to env.file..."
 cp integration_test/integration_test_env.file env.file
 
+# Optional: PATROL_TAGS narrows the run (e.g. PATROL_TAGS='web && gherkin');
+# extra arguments go to patrol (e.g. --target integration_test/features).
 echo "Building the app and running tests..."
 patrol test -v \
-    --tags=web \
+    --tags="${PATROL_TAGS:-web}" \
     --device=chrome \
     --web-port=3000 \
     --web-browser-args='["--lang=en-US","--accept-lang=en-US,en"]' \
@@ -69,4 +71,5 @@ patrol test -v \
     --dart-define=ADDITIONAL_MAIL_RECIPIENT="$ALICE@$DOMAIN" \
     --dart-define=BASIC_AUTH_EMAIL="$BOB@$DOMAIN" \
     --dart-define=BASIC_AUTH_URL="$BASIC_AUTH_URL" \
-    --dart-define=RESET_SERVER_URL="http://localhost:$RESET_PORT"
+    --dart-define=RESET_SERVER_URL="http://localhost:$RESET_PORT" \
+    "$@"
