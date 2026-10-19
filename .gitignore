@@ -121,6 +121,8 @@ app.*.symbols
 messages_*.dart
 *.mocks.dart
 test_bundle.dart
+# Patrol tests generated from integration_test/features/**/*.feature
+/integration_test/features/**/*_test.dart
 playwright-report
 test-results
 
