@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Runs every test of one package: the VM tests, then the @TestOn('chrome') suites on Chrome.
-# MODULES is "default" for the root package, otherwise the package folder.
+# MODULES is "default" for the root package, "golden" for every package under golden/,
+# otherwise the package folder.
 #
 # CI supports exactly two platform declarations, each alone on its line: @TestOn('vm') and
 # @TestOn('chrome'). Any other platform metadata (another selector, @OnPlatform, a per-test
@@ -15,13 +16,24 @@ PLATFORM_METADATA='TestOn|testOn|OnPlatform|onPlatform'
 SUPPORTED_TEST_ON="@TestOn\(['\"](vm|chrome)['\"]\)$"
 CHROME_TEST_ON="^@TestOn\(['\"]chrome['\"]\)$"
 
+# The golden packages (golden/kit, golden/suites/*, ...) share one CI module: each runs in turn.
+if [[ "$MODULES" == "golden" ]]; then
+    golden_status=0
+    while IFS= read -r pubspec; do
+        package=$(dirname "$pubspec")
+        [[ -d "$package/test" ]] || continue
+        MODULES="$package" bash "$0" || golden_status=1
+    done < <(git ls-files 'golden/*pubspec.yaml' | sort)
+    exit "$golden_status"
+fi
+
 package_dir=$([[ "$MODULES" == "default" ]] && echo . || echo "$MODULES")
 # Write the machine-readable reports straight to files instead of redirecting stdout:
 # `flutter test` runs an implicit `pub get` first, and that output would otherwise be
 # captured into the report and invalidate the JSON. Keeping stdout free also leaves failure
 # details visible in the CI log.
-REPORT="$PWD/test-report-$MODULES.json"
-CHROME_REPORT="$PWD/test-report-$MODULES-chrome.json"
+REPORT="$PWD/test-report-${MODULES//\//-}.json"
+CHROME_REPORT="$PWD/test-report-${MODULES//\//-}-chrome.json"
 
 guard_status=0
 unsupported=$(cd "$package_dir" && grep -rnE "$PLATFORM_METADATA" --include='*_test.dart' test \

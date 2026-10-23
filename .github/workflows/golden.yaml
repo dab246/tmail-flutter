@@ -1,0 +1,102 @@
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "verify, update (uploads regenerated goldens), or mutation (proves the goldens can fail)"
+        type: choice
+        options: [verify, update, mutation]
+        default: verify
+
+name: Golden tests
+
+permissions:
+  contents: read
+
+env:
+  FLUTTER_VERSION: 3.38.9
+
+# Text goldens run with every other unit test in analyze-test.yaml (module "golden").
+# This workflow renders the pixel goldens of the suites a change affects.
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      suites: ${{ steps.affected.outputs.suites }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Find affected pixel suites
+        id: affected
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [[ -n "$BASE_SHA" ]]; then
+            suites=$(golden/tool/affected_pixel_suites.sh "$BASE_SHA")
+          else
+            suites=$(golden/tool/affected_pixel_suites.sh --all)
+          fi
+          echo "suites=$suites" >> "$GITHUB_OUTPUT"
+          echo "Affected pixel suites: $suites"
+
+  pixel:
+    needs: changes
+    if: needs.changes.outputs.suites != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: ${{ fromJSON(needs.changes.outputs.suites) }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: "stable"
+          cache: true
+          cache-key: "deps-${{ hashFiles('pubspec.lock') }}"
+          cache-path: ${{ runner.tool_cache }}/flutter
+      - name: Run prebuild
+        run: ./scripts/prebuild.sh
+      - name: Render pixel goldens
+        env:
+          MODE: ${{ inputs.mode || 'verify' }}
+          SUITE: ${{ matrix.suite }}
+        run: |
+          case "$MODE" in
+            update) flag=--update ;;
+            mutation) flag=--mutation ;;
+            *) flag= ;;
+          esac
+          bash golden/run.sh --suite "$SUITE" --pixel ${flag:+"$flag"}
+      - name: Upload regenerated goldens
+        if: inputs.mode == 'update'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pixel-goldens-${{ matrix.suite }}
+          path: golden/suites/${{ matrix.suite }}/goldens/pixel
+      - name: Upload report
+        if: failure() || inputs.mode == 'mutation'
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-report-${{ matrix.suite }}
+          path: |
+            golden/playwright/playwright-report
+            golden/playwright/test-results
+
+  # Always reports, so it can be the required check even when no suite is affected.
+  gate:
+    needs: [changes, pixel]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        env:
+          CHANGES: ${{ needs.changes.result }}
+          PIXEL: ${{ needs.pixel.result }}
+        run: |
+          echo "changes: $CHANGES, pixel: $PIXEL"
+          [[ "$CHANGES" == "success" ]] || exit 1
+          [[ "$PIXEL" == "success" || "$PIXEL" == "skipped" ]] || exit 1
